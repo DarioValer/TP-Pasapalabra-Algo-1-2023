@@ -9,50 +9,69 @@ from datos import obtener_lista_definiciones
 PUNTOS_ACIERTO=10
 PUNTOS_ERROR=-3
 POSICION_PALABRA_INGRESADA = -1
-ARCHIVO_PALABRAS = open('./palabras.txt', 'r')
-ARCHIVO_DEFINICION = open('./definiciones.txt', 'r')
-PALABRA = ARCHIVO_PALABRAS.readline().rstrip('\n')
-DEFINICION = ARCHIVO_DEFINICION.readline().rstrip('\n')
+
+
+#ETAPA_8
+def cargar_diccionario():
+    diccionario = {}
+    archivo_palabras = open("TP-Pasapalabra-Algo-1-2023\palabras.txt", "r", encoding="utf8")
+    archivo_definiciones = open("TP-Pasapalabra-Algo-1-2023\definiciones.txt", "r", encoding="utf8")
+    palabra = archivo_palabras.readline().rstrip('\n')
+    definicion = archivo_definiciones.readline().rstrip('\n')
+    while(palabra != ''):
+        diccionario[palabra] = definicion
+        definicion = archivo_definiciones.readline().rstrip('\n')
+        palabra = archivo_palabras.readline().rstrip('\n')
+    archivo_palabras.close()
+    archivo_definiciones.close()
+    return diccionario
+
+def generar_archivo_diccionario_ordenado(diccionario):
+    archivo_csv = open("TP-Pasapalabra-Algo-1-2023\diccionario_ordenado.csv", "w", encoding="utf8")
+    diccionario_ordenado = sorted(list(diccionario.items()), key = lambda x:x[0])
+    for i in diccionario_ordenado:
+        archivo_csv.write(str(i) + '\n')
+    archivo_csv.close()
 
 #FUNCIONES ETAPA 2
-def sacar_tildes(letra):
-    'Autor Correccion DV'
-    letra_m = letra.lower()
-    acentuadas = {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n'}
-    letra_sin_tilde = acentuadas.get(letra_m, letra)
-    return letra_sin_tilde
+# def sacar_tildes(letra):
+#     'Autor Correccion DV'
+#     letra_m = letra.lower()
+#     acentuadas = {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n'}
+#     letra_sin_tilde = acentuadas.get(letra_m, letra)
+#     return letra_sin_tilde
 
-def cargar_diccionario(lista_de_definiciones): 
-    ''' Minimo de 5 letras por palabra de lo contrario no selecciona, se muestra por consola el total de palabras que hay por cada letra, 
-    y el total que hay en el diccionario.
-    Autor: Matias'''
-    diccionario = {} 
-    ''' El bucle itera y desempaqueta cada elemento de lista_de_definiciones. 
-    En las variables, palabra ocupara el valor "palabra1" y definicion el valor "definicion1"
-    Autor: Matias '''
-    for palabra, definicion in lista_de_definiciones: 
-        if len(palabra) >= 5:
-            letra = palabra[0]
-            letra_standard = sacar_tildes(letra)
-            if letra_standard not in diccionario: 
-                diccionario[letra_standard] = {} 
-            diccionario[letra_standard][palabra] = definicion
-    return diccionario 
+# def cargar_diccionario(lista_de_definiciones): 
+#     ''' Minimo de 5 letras por palabra de lo contrario no selecciona, se muestra por consola el total de palabras que hay por cada letra, 
+#     y el total que hay en el diccionario.
+#     Autor: Matias'''
+#     diccionario = {} 
+#     ''' El bucle itera y desempaqueta cada elemento de lista_de_definiciones. 
+#     En las variables, palabra ocupara el valor "palabra1" y definicion el valor "definicion1"
+#     Autor: Matias '''
+#     for palabra, definicion in lista_de_definiciones: 
+#         if len(palabra) >= 5:
+#             letra = palabra[0]
+#             letra_standard = sacar_tildes(letra)
+#             if letra_standard not in diccionario: 
+#                 diccionario[letra_standard] = {} 
+#             diccionario[letra_standard][palabra] = definicion
+#     return diccionario 
 
-def mostrar_diccionario(dictionary_words:dict):
-    ''' 
-    funcion: mostrar_diccionario
-    dictionary_words: diccionario anidado con tres niveles de profundidad
-    letra: Toma el valor de la clave principal (a, b, c hasta la z)
-    Salida: La letra a tiene: 48, La letra b tiene: 26 etc. Palabras del diccionario: 1394    
-    Autor: Matias Gonzalez
-    '''
-    total_words = 0
-    for letra in sorted (dictionary_words.keys()):
-        print("La letra", letra, "tiene: ", len(dictionary_words[letra].keys()))
-        total_words += len(dictionary_words[letra].keys())
+# def mostrar_diccionario(dictionary_words:dict):
+#     ''' 
+#     funcion: mostrar_diccionario
+#     dictionary_words: diccionario anidado con tres niveles de profundidad
+#     letra: Toma el valor de la clave principal (a, b, c hasta la z)
+#     Salida: La letra a tiene: 48, La letra b tiene: 26 etc. Palabras del diccionario: 1394    
+#     Autor: Matias Gonzalez
+#     '''
+#     total_words = 0
+#     for letra in sorted (dictionary_words.keys()):
+#         print("La letra", letra, "tiene: ", len(dictionary_words[letra].keys()))
+#         total_words += len(dictionary_words[letra].keys())
         
-    print("Palabras del diccionario: ", total_words)
+#     print("Palabras del diccionario: ", total_words)
 
 #FUNCIONES ETAPA 3
 
