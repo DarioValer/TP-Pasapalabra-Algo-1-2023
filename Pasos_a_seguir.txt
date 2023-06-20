@@ -34,3 +34,5 @@ ETAPA 10
     por omision(los del archivo) o configuracion(cuando usuario cambia).
 3. El juegador podrá configurar los valores por defecto al finalizar el primer 
 juego(o al iniciar una nuevo juego)
+
+Hola Mundo
