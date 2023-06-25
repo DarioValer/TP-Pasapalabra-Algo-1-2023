@@ -12,11 +12,7 @@ POSICION_PALABRA_INGRESADA = -1
 ACIERTOS = 0
 ERRORES = 1
 PUNTAJE_PARCIAL = 2
-PUNTAJE_TOTAL = 3
-ACIERTOS = 0
-ERRORES = 1
-PUNTAJE_PARCIAL = 2
-PUNTAJE_TOTAL = 3
+PUNTAJE_PARTIDA = 3
 
 #ETAPA_8
 def cargar_diccionario():
@@ -277,25 +273,31 @@ def mostrar_lista_participantes(diccionario_jugadores):
     print('\n')
 # Funciones Etapa 5
 
-def calcular_puntaje_ronda(cant_aciertos:int,cant_errores:int):
+def calcular_puntaje_partida(diccionario_jugadores):
     """Calcula y devuelve el puntaje de una ronda determinada dados los aciertos y errores cometidos.
-        Autor:Eduardo
+        Autor:Dario y Luz
     """
-    puntaje = PUNTOS_ACIERTO*cant_aciertos+PUNTOS_ERROR*cant_errores
-    return(puntaje)
+    for jugador in diccionario_jugadores:
+        puntaje = PUNTOS_ACIERTO*diccionario_jugadores[jugador][ACIERTOS]+PUNTOS_ERROR*diccionario_jugadores[jugador][ERRORES]
+        diccionario_jugadores[jugador][PUNTAJE_PARTIDA] = puntaje
 
-def mostrar_puntajes(puntaje_actual,cant_aciertos,cant_errores):
+def mostrar_puntajes(diccionario_jugadores):
     """Muestra el puntaje de ronda y el total acumulado dados los aciertos y errores cometidos en la ronda
     actual.
-        Autor:Eduardo
+        Autor:Dario y Luz
     """
-    puntaje_total = puntaje_actual + calcular_puntaje_ronda(cant_aciertos,cant_errores)
-    print("Puntaje Final de esta ronda:",puntaje_actual)
-    print("El puntaje total acumulado es:")
-    print(puntaje_total)
+    print('\n')
+    print('Puntaje de la partida:')
+    for jugador in diccionario_jugadores:
+        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' - ' + str(diccionario_jugadores[jugador][PUNTAJE_PARTIDA]) + ' puntos')
+    print('\n')
+    print('Puntaje parcial:')
+    for jugador in diccionario_jugadores:
+        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' - ' + str(diccionario_jugadores[jugador][PUNTAJE_PARCIAL]) + ' puntos')
+
 
 def turnos(letra, largo_palabra, lista_jugadores, nombre_jugador):
-    print('Turno Jugador '+ str(lista_jugadores.index(nombre_jugador)+1) + ' ' + nombre_jugador + ' ' + '- letra '+ letra + ' - Palabra de '+ str(largo_palabra) + ' letras')
+    print('Turno Jugador '+ str(lista_jugadores.index(nombre_jugador)+1) + ' ' + nombre_jugador + ' ' + '- letra '+ letra.upper() + ' - Palabra de '+ str(largo_palabra) + ' letras')
 
 def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, lista_palabras_ordenadas, lista_jugadores_por_turno):
     """
@@ -312,12 +314,24 @@ def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, li
             numero_jugador += 1
         indice += 1
 
-def mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores):
+def agregar_puntaje_parcial(diccionario_jugadores):
+    for jugador in diccionario_jugadores:
+        diccionario_jugadores[jugador][PUNTAJE_PARCIAL] += diccionario_jugadores[jugador][PUNTAJE_PARTIDA]
+
+def mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego, lista_jugadores):
     print(mostrar_rosco_letras(letras_participantes))
     print(mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego))
     print(resultado_palabra(lista_palabras_ingresadas,letras_participantes,palabras_del_juego))
-    print('Aciertos: '+ str(cant_aciertos))
-    print('Errores: '+ str(cant_errores))
+
+def mostrar_reporte_final(diccionario_jugadores, numero_partidas):
+    print('\n')
+    print('Reporte Final:')
+    print('Partidas jugadas:' + str(numero_partidas))
+    print('\n')
+    print('Puntaje Final:')
+    for jugador in diccionario_jugadores:
+        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' - ' + str(diccionario_jugadores[jugador][PUNTAJE_PARCIAL]) + ' puntos')
+
 
 def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, lista_jugadores, diccionario_jugadores):
     """
@@ -328,17 +342,19 @@ def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaj
     turno=0
     cant_aciertos= 0
     cant_errores= 0
+    error_jugador = 0
     lista_palabras_ingresadas = []
     lista_jugadores_por_turno = []
     
-    while turno < len(palabras_del_juego) and cant_errores < len(lista_jugadores) :
-        
+    
+    while turno < len(palabras_del_juego) and error_jugador < len(lista_jugadores) :
+
         largo_palabra = len(palabras_del_juego[turno])
         letra = letras_participantes[turno]
-        mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores)
+        mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego, lista_jugadores)
+        nombre_jugador = lista_jugadores[error_jugador]
+        lista_valores_jugador= [0, 0, diccionario_jugadores[nombre_jugador][PUNTAJE_PARCIAL], 0]
         mostrar_lista_participantes(diccionario_jugadores)
-
-        nombre_jugador = lista_jugadores[cant_errores]
         lista_jugadores_por_turno.append(nombre_jugador)
         turnos(letra ,largo_palabra, lista_jugadores, nombre_jugador)
         print('Definición: '+ definiciones[letras_participantes[turno]][palabras_del_juego[turno]])
@@ -348,13 +364,27 @@ def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaj
         validacion = confirmar_palabra(palabra_ingresada,lista_palabras_ingresadas,palabras_del_juego)
         aciertos, errores=incrementar_aciertos_errores(validacion, cant_aciertos, cant_errores)
         turno += 1 
-        diccionario_jugadores[nombre_jugador][ACIERTOS] += 1
-        diccionario_jugadores[nombre_jugador][ERRORES] += 1
+        if errores == 1 : error_jugador += 1
         cant_aciertos = aciertos
         cant_errores = errores
-    mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores)
+        lista_valores_jugador[ACIERTOS] = cant_aciertos
+        lista_valores_jugador[ERRORES] = cant_errores
+        diccionario_jugadores[nombre_jugador] = lista_valores_jugador
+        if error_jugador > int(lista_jugadores.index(nombre_jugador)):
+            cant_aciertos = 0
+            cant_errores = 0
+    
+    mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego, lista_jugadores)
     mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, palabras_del_juego, lista_jugadores_por_turno)
-    mostrar_puntajes(puntaje,cant_aciertos,cant_errores) #Acá agregar puntaje de partida y parcial
+    calcular_puntaje_partida(diccionario_jugadores) 
+    agregar_puntaje_parcial(diccionario_jugadores)
+    mostrar_puntajes(diccionario_jugadores) #Acá agregar puntaje de partida y parcial
+    for jugador in diccionario_jugadores : 
+        diccionario_jugadores[jugador][PUNTAJE_PARTIDA] = 0
+        diccionario_jugadores[jugador][ACIERTOS] = 0
+        diccionario_jugadores[jugador][ERRORES] = 0
+    
+
     
     return puntaje
         
@@ -367,16 +397,12 @@ def main():
     sigue_jugando=True
     puntaje = 0
     cant_jugadores = preguntar_cant_jugadores()
+    contador_partidas = 1
 
     #PREARMADO DEL JUEGO
     definiciones = cargar_diccionario()
     lista_jugadores = listar_jugadores(cant_jugadores)
-    print(lista_jugadores)
     diccionario_jugadores = cargar_diccionario_jugadores(lista_jugadores)
-    print(diccionario_jugadores)
-    #lista_definiciones= obtener_lista_definiciones() 
-    #definiciones=cargar_diccionario(lista_definiciones)
-    #mostrar_diccionario(definiciones)
 
     #JUEGO
     while sigue_jugando:
@@ -384,10 +410,15 @@ def main():
         palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego)
         print(palabras_del_juego)
     #POST Ronda(PUNTUACION+nueva partida)
-        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores)   
-        continua=input("Desea jugar otra partida? Presione la tecla ""S"", cualquier otra para salir:")
+        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores)
+        
+        continua=input('Desea jugar otra partida? Presione la tecla "s", cualquier otra para salir:')
         acepta_continuar="s"
-        if not continua.lower()==acepta_continuar : sigue_jugando=False
-    #print(doctest.testmod())
+        if not continua.lower()==acepta_continuar or contador_partidas > 5:
+            sigue_jugando=False
+        else:
+            contador_partidas += 1
+    print(mostrar_reporte_final(diccionario_jugadores, contador_partidas))
 
-main()
+if __name__ == "__main__":
+    main()
