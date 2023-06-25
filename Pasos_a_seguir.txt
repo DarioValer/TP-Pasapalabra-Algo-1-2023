@@ -5,11 +5,11 @@ ETAPA 8
 
 
 ETAPA 9
-1. Definir jugadores.
-    -preguntar cant jugadores (max 4)
-    -nombres min 4 y max 20 caracteres alnum()
+1. Definir jugadores.*
+    -preguntar cant jugadores (max 4)*
+    -nombres min 4 y max 20 caracteres alnum()*
     -ingresarlos a 1 diccionario de listas con clave nombre y valor lista con
-     aciertos, errores, puntaje parcial, puntaje total
+     aciertos, errores, puntaje parcial, puntaje total*
     
 2. Dinamica de juego
     - Mostrar rosco de que jugador jugo cada turno

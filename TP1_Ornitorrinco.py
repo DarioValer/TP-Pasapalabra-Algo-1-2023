@@ -16,9 +16,12 @@ PUNTAJE_PARTIDA = 3
 
 #ETAPA_8
 def cargar_diccionario():
+    '''
+    Autores: Dario y Luz
+    '''
     diccionario = {}
-    archivo_palabras = open(".\palabras.txt", "r", encoding="utf8")
-    archivo_definiciones = open(".\definiciones.txt", "r", encoding="utf8")
+    archivo_palabras = open("TP-Pasapalabra-Algo-1-2023\palabras.txt", "r", encoding="utf8")
+    archivo_definiciones = open("TP-Pasapalabra-Algo-1-2023\definiciones.txt", "r", encoding="utf8")
     palabra = archivo_palabras.readline().rstrip('\n')
     definicion = archivo_definiciones.readline().rstrip('\n')
     while(palabra != ''):
@@ -33,6 +36,9 @@ def cargar_diccionario():
     return diccionario
 
 def generar_archivo_diccionario_ordenado(diccionario):
+    '''
+    Autores: Dario y Luz
+    '''
     archivo_csv = open(".\diccionario_ordenado.csv", "w", encoding="utf8")
     diccionario_ordenado = sorted(list(diccionario.items()), key = lambda x:x[0])
     for i in diccionario_ordenado:
@@ -41,6 +47,16 @@ def generar_archivo_diccionario_ordenado(diccionario):
 
 #ETAPA 9
 def validar_nombre(nombre):
+    '''
+    Autores: Dario y Luz
+
+    >>> validar_nombre('Dario')
+    True
+    >>> validar_nombre('Edu')
+    False
+    >>> validar_nombre('Luchi')
+    True
+    '''
     respuesta = False
     largo_nom = len(nombre)
     if(largo_nom >= 4 and largo_nom <= 20 and nombre.isalnum()):
@@ -63,6 +79,13 @@ def listar_jugadores(cant_jugadores):
     return lista_jugadores
 
 def cargar_diccionario_jugadores(lista_jugadores):
+    '''
+    Autores: Dario y Luz
+    >>> cargar_diccionario_jugadores(['Dario', 'Luz', 'Agus'])
+    {'Dario': [0, 0, 0, 0], 'Luz': [0, 0, 0, 0], 'Agus': [0, 0, 0, 0]}
+    >>> cargar_diccionario_jugadores(['Dario', 'Damian', 'Demian'])
+    {'Dario': [0, 0, 0, 0], 'Damian': [0, 0, 0, 0], 'Demian': [0, 0, 0, 0]}
+    '''
     diccionario_jugadores = {}
     lista_de_valores = [0, 0, 0, 0]
     for nombre in lista_jugadores:
@@ -127,33 +150,15 @@ def crear_palabras_del_juego (definiciones, letras_participantes:list):
 
 
 #FUNCIONES ETAPA 1
-
-def pregunta_palabra():
-    '''
-    La función pregunta_palabra le pide al usuario que ingrese una palabra
-    y devuelve la palabra para luego utilizarla.
-    AUTOR: Sebastián 
-    '''
-    palabra=input("Ingrese palabra: ")
-    return palabra
-    
-
 def verificador_de_palabra(palabra_del_turno):
     '''
-    La funcion verificador_de_palabra recibe el turno y las palabras_del_juego, va a llamar a las funciones
-    pregunta_palabra y obtener_longitud_palabra para luego verificar que la palabra ingresada cumpla con las
+    La funcion verificador_de_palabra recibe el turno y las palabras_del_juego, va a llamar a 
+    obtener_longitud_palabra para luego verificar que la palabra ingresada cumpla con las
     condiciones necesarias para usarse ,en caso contrario volvera a preguntar hasta devolver la palabra pedida.
-    AUTOR: Sebastián.
-    
-    >>> verificador_de_palabra(5, ['añadir', 'fatal', 'hacinamiento', 'jarabe', 'kevlar', 'mecha', 'sustancia', 'urgir', 'voltear', 'xerografía'])
-    'macha'
-    >>> verificador_de_palabra(9, ['bilirrubina', 'factible', 'hamaca', 'jurar', 'nebulizar', 'oponer', 'quedar', 'windsurf', 'yarará', 'zambullir'])
-    'zambullir'
-    >>> verificador_de_palabra(1, ['bilirrubina', 'factible', 'hamaca', 'jurar', 'nebulizar', 'oponer', 'quedar', 'windsurf', 'yarará', 'zambullir'])
-    'factible'
-    
+    AUTOR: Dario y Luz.
     '''
-    palabra_ingresada= pregunta_palabra().lower()
+    palabra = input("Ingrese palabra: ")
+    palabra_ingresada= palabra.lower()
     longitud_de_palabra= len(palabra_del_turno)
     palabra_valida=False
     while not palabra_valida:
@@ -161,7 +166,7 @@ def verificador_de_palabra(palabra_del_turno):
             palabra_valida=True
         else:
             print("Revise la palabra que escribio,la misma no debe contener espacios, caracteres especiales, numeros, y debe tener",longitud_de_palabra,"caracteres")
-            palabra_ingresada=pregunta_palabra().lower()
+            palabra_ingresada=palabra.lower()
     return palabra_ingresada
 
 def confirmar_palabra(palabra_a_confirmar,lista_palabras_ingresadas,palabras_del_juego:list):
@@ -169,16 +174,6 @@ def confirmar_palabra(palabra_a_confirmar,lista_palabras_ingresadas,palabras_del
     Esta funcion devuelve True o False dependiendo de si la palabra ingresada por el usuario 
     este en la lista de palabras del juego y a su vez que su posicion sea la correcta.
     AUTOR: Dario.
-
-    >>> confirmar_palabra('arco',['arco'],['arco','barco','casco','diarco'])
-    True
-
-    >>> confirmar_palabra('arco',['arco', 'biblioteca', 'barco'],['arco','barco','casco','diarco'])
-    False
-
-    >>> confirmar_palabra('casa',['arco', 'barco', 'casa'],['arco','barco','casco','diarco'])
-    False
-
     '''
     lista_indices = [indice for indice, dato in enumerate(lista_palabras_ingresadas) if dato == palabra_a_confirmar]
     if palabra_a_confirmar in palabras_del_juego and palabra_a_confirmar == palabras_del_juego[lista_indices[-1]]:
@@ -194,14 +189,14 @@ def incrementar_aciertos_errores(validacion, cant_aciertos, cant_errores):
     contara los aciertos y los errores y los devolvera.
     Autor:Sebastián
     
-    >>> incrementar_aciertos_errores('arroz', 0, 0, ['arroz'],['arroz','barco', 'camion'])
+    >>> incrementar_aciertos_errores(True, 0, 0)
     (1, 0)
 
-    >>> incrementar_aciertos_errores('arco', 1, 0, ['arroz', 'arco'],['arroz','barco', 'camion'])
+    >>> incrementar_aciertos_errores(False, 1, 0)
     (1, 1)
 
-    >>> incrementar_aciertos_errores('arroz', 5, 4, ['arroz'],['arroz','barco', 'camion'])
-    (6, 4)
+    >>> incrementar_aciertos_errores(False, 6, 0)
+    (6, 1)
 
     '''
     if validacion:
