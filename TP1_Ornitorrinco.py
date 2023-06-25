@@ -7,8 +7,12 @@ from datos import obtener_lista_definiciones
 
 #CONSTANTES
 PUNTOS_ACIERTO=10
-PUNTOS_ERROR=-3
+PUNTOS_ERROR=3
 POSICION_PALABRA_INGRESADA = -1
+ACIERTOS = 0
+ERRORES = 1
+PUNTAJE_PARCIAL = 2
+PUNTAJE_TOTAL = 3
 ACIERTOS = 0
 ERRORES = 1
 PUNTAJE_PARCIAL = 2
@@ -17,12 +21,15 @@ PUNTAJE_TOTAL = 3
 #ETAPA_8
 def cargar_diccionario():
     diccionario = {}
-    archivo_palabras = open("TP-Pasapalabra-Algo-1-2023\palabras.txt", "r", encoding="utf8")
-    archivo_definiciones = open("TP-Pasapalabra-Algo-1-2023\definiciones.txt", "r", encoding="utf8")
+    archivo_palabras = open(".\palabras.txt", "r", encoding="utf8")
+    archivo_definiciones = open(".\definiciones.txt", "r", encoding="utf8")
     palabra = archivo_palabras.readline().rstrip('\n')
     definicion = archivo_definiciones.readline().rstrip('\n')
     while(palabra != ''):
-        diccionario[palabra] = definicion
+        letra = palabra[0]
+        if letra not in diccionario:
+            diccionario[letra] = {}
+        diccionario[letra][palabra] = definicion
         definicion = archivo_definiciones.readline().rstrip('\n')
         palabra = archivo_palabras.readline().rstrip('\n')
     archivo_palabras.close()
@@ -30,7 +37,7 @@ def cargar_diccionario():
     return diccionario
 
 def generar_archivo_diccionario_ordenado(diccionario):
-    archivo_csv = open("TP-Pasapalabra-Algo-1-2023\diccionario_ordenado.csv", "w", encoding="utf8")
+    archivo_csv = open(".\diccionario_ordenado.csv", "w", encoding="utf8")
     diccionario_ordenado = sorted(list(diccionario.items()), key = lambda x:x[0])
     for i in diccionario_ordenado:
         archivo_csv.write(str(i) + '\n')
@@ -54,19 +61,19 @@ def listar_jugadores(cant_jugadores):
     lista_jugadores = []
     for i in range(1, cant_jugadores + 1):
         nombre = input('Ingrese el nombre del jugador '+ str(i) +': ')
-        while(validar_nombre(nombre) == False):
-            nombre = input('El nombre ingresado solo debe contener un minimo de 4 caracteres y deben ser alfanumericos: ')
-        lista_jugadores.append()
+        while(validar_nombre(nombre) == False or (nombre in lista_jugadores)):
+            nombre = input('El nombre ingresado no puede repetirse, debe contener como mínimo 4 caracteres y estos deben ser alfanumericos: ')
+        lista_jugadores.append(nombre)
     return lista_jugadores
 
 def cargar_diccionario_jugadores(lista_jugadores):
     diccionario_jugadores = {}
     lista_de_valores = [0, 0, 0, 0]
-    for i in lista_jugadores:
+    for nombre in lista_jugadores:
         if(nombre in diccionario_jugadores):
             while(nombre in diccionario_jugadores):
                 nombre = input('Este nombre ya esta en uso, ingrese uno nuevo: ')
-        diccionario_jugadores[i] = lista_de_valores
+        diccionario_jugadores[nombre] = lista_de_valores
     return diccionario_jugadores
 
 def mostrar_jugadores(diccionario_jugadores):
@@ -222,19 +229,20 @@ def mostrar_rosco_letras(letras_participantes):
         letras += '['+letra.upper()+']'
     return letras
 
-def mostrar_rosco_jugadores(letras_participantes, cant_jugadores, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego):
+def mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego):
     resultado=''
-    indice_jugador = 0
+    indice_jugador = 1
     i = 0
     if len(lista_palabras_ingresadas) == 0:
         for letra in letras_participantes:
             resultado += '[ ]'
     else:
-        while(indice_jugador <= cant_jugadores or i < len(lista_palabras_ingresadas)):
-            resultado += '['+str(lista_jugadores[indice_jugador])+']'
-            if confirmar_palabra(i,lista_palabras_ingresadas,palabras_del_juego) == False:
-                resultado += '['+str(lista_jugadores[indice_jugador])+']'
+        while(indice_jugador <= len(lista_jugadores) and i < len(lista_palabras_ingresadas)):
+            if confirmar_palabra(lista_palabras_ingresadas[i],lista_palabras_ingresadas,palabras_del_juego) == False:
+                resultado += '['+str(indice_jugador)+']'
                 indice_jugador += 1
+            else:
+                resultado += '['+str(indice_jugador)+']'
             i += 1
         espacios_vacios = len(letras_participantes) - len(lista_palabras_ingresadas)
         for vacio in range(0, espacios_vacios):
@@ -262,6 +270,11 @@ def resultado_palabra(lista_palabras_ingresadas:list,letras_participantes:list,p
             resultado += '[ ]'
     return resultado
 
+def mostrar_lista_participantes(diccionario_jugadores):
+    print('\nJugadores:')
+    for jugador in diccionario_jugadores:
+        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' -  Aciertos: ' + str(diccionario_jugadores[jugador][ACIERTOS]) + ' - Errores: ' + str(diccionario_jugadores[jugador][ERRORES]))
+    print('\n')
 # Funciones Etapa 5
 
 def calcular_puntaje_ronda(cant_aciertos:int,cant_errores:int):
@@ -281,32 +294,32 @@ def mostrar_puntajes(puntaje_actual,cant_aciertos,cant_errores):
     print("El puntaje total acumulado es:")
     print(puntaje_total)
 
-def turnos(letra, largo_palabra, lista_jugadores):
-    for i in range(len(lista_jugadores) - 1):
-        nombre = lista_jugadores[i]
-        print('Turno Jugador'+ str(i) + nombre +'- letra '+ letra + ' - Palabra de '+ str(largo_palabra) + ' letras')
+def turnos(letra, largo_palabra, lista_jugadores, nombre_jugador):
+    print('Turno Jugador '+ str(lista_jugadores.index(nombre_jugador)+1) + ' ' + nombre_jugador + ' ' + '- letra '+ letra + ' - Palabra de '+ str(largo_palabra) + ' letras')
 
-def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, lista_palabras_ordenadas):
+def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, lista_palabras_ordenadas, lista_jugadores_por_turno):
     """
     La funcion imprime por pantalla el resultado turno por turno de la ronda que acaba de concluir. 
     Autores: Luz y Dario
     """
     indice = 0
+    numero_jugador = 1
     for palabra in lista_palabras_ingresadas:
         if palabra == lista_palabras_ordenadas[indice]:
-            print('Turno letra '+ str(letras_participantes[indice]) + ' - Palabra de ' + str(len(lista_palabras_ordenadas[indice])) + ' letras - ' + palabra + ' - acierto')
+            print('Turno letra '+ str(letras_participantes[indice]).upper() + ' Jugador ' + str(numero_jugador) + ' ' + lista_jugadores_por_turno[indice] + ' - Palabra de ' + str(len(lista_palabras_ordenadas[indice])) + ' letras - ' + palabra + ' - acierto')
         else:
-            print('Turno letra '+ str(letras_participantes[indice]) + ' - Palabra de ' + str(len(lista_palabras_ordenadas[indice])) + ' letras - ' + palabra + ' - error - Palabra Correcta: ' + str(lista_palabras_ordenadas[indice]))
+            print('Turno letra '+ str(letras_participantes[indice]).upper() + ' Jugador ' + str(numero_jugador) + ' ' + lista_jugadores_por_turno[indice] + ' - Palabra de ' + str(len(lista_palabras_ordenadas[indice])) + ' letras - ' + palabra + ' - error - Palabra Correcta: ' + str(lista_palabras_ordenadas[indice]))
+            numero_jugador += 1
         indice += 1
 
-def mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores):
+def mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores):
     print(mostrar_rosco_letras(letras_participantes))
+    print(mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego))
     print(resultado_palabra(lista_palabras_ingresadas,letras_participantes,palabras_del_juego))
     print('Aciertos: '+ str(cant_aciertos))
     print('Errores: '+ str(cant_errores))
 
-
-def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, cant_jugadores):
+def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, lista_jugadores, diccionario_jugadores):
     """
     La funcion jugar es el encargado de mostrar por pantalla el tablero,tambien se encarga de manejar el juego
     interactuando con el usuario y mostrando como avanza la partida
@@ -314,27 +327,34 @@ def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaj
     """
     turno=0
     cant_aciertos= 0
-    cant_errores=0
+    cant_errores= 0
     lista_palabras_ingresadas = []
-    while turno < len(palabras_del_juego):
-        mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores)
+    lista_jugadores_por_turno = []
+    
+    while turno < len(palabras_del_juego) and cant_errores < len(lista_jugadores) :
+        
         largo_palabra = len(palabras_del_juego[turno])
         letra = letras_participantes[turno]
-        lista_jugadores = listar_jugadores(cant_jugadores)
-        print(mostrar_rosco_jugadores(letras_participantes, cant_jugadores, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego))
-        turnos(letra ,largo_palabra, lista_jugadores)
+        mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores)
+        mostrar_lista_participantes(diccionario_jugadores)
+
+        nombre_jugador = lista_jugadores[cant_errores]
+        lista_jugadores_por_turno.append(nombre_jugador)
+        turnos(letra ,largo_palabra, lista_jugadores, nombre_jugador)
         print('Definición: '+ definiciones[letras_participantes[turno]][palabras_del_juego[turno]])
         palabra_del_turno = palabras_del_juego[turno]
         palabra_ingresada=verificador_de_palabra(palabra_del_turno) 
         lista_palabras_ingresadas.append(palabra_ingresada)
         validacion = confirmar_palabra(palabra_ingresada,lista_palabras_ingresadas,palabras_del_juego)
         aciertos, errores=incrementar_aciertos_errores(validacion, cant_aciertos, cant_errores)
-        turno += 1
+        turno += 1 
+        diccionario_jugadores[nombre_jugador][ACIERTOS] += 1
+        diccionario_jugadores[nombre_jugador][ERRORES] += 1
         cant_aciertos = aciertos
         cant_errores = errores
-    mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores)
-    mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, palabras_del_juego)
-    mostrar_puntajes(puntaje,cant_aciertos,cant_errores)
+    mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego,cant_aciertos,cant_errores, lista_jugadores)
+    mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, palabras_del_juego, lista_jugadores_por_turno)
+    mostrar_puntajes(puntaje,cant_aciertos,cant_errores) #Acá agregar puntaje de partida y parcial
     
     return puntaje
         
@@ -350,6 +370,10 @@ def main():
 
     #PREARMADO DEL JUEGO
     definiciones = cargar_diccionario()
+    lista_jugadores = listar_jugadores(cant_jugadores)
+    print(lista_jugadores)
+    diccionario_jugadores = cargar_diccionario_jugadores(lista_jugadores)
+    print(diccionario_jugadores)
     #lista_definiciones= obtener_lista_definiciones() 
     #definiciones=cargar_diccionario(lista_definiciones)
     #mostrar_diccionario(definiciones)
@@ -360,10 +384,10 @@ def main():
         palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego)
         print(palabras_del_juego)
     #POST Ronda(PUNTUACION+nueva partida)
-        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, cant_jugadores)   
+        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores)   
         continua=input("Desea jugar otra partida? Presione la tecla ""S"", cualquier otra para salir:")
         acepta_continuar="s"
         if not continua.lower()==acepta_continuar : sigue_jugando=False
-    print(doctest.testmod())
+    #print(doctest.testmod())
 
 main()
