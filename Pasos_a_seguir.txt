@@ -1,7 +1,7 @@
 ETAPA 8
-1. Hacer diccionario con 2 archivos txt 
-2. Usar diccionario para generar archivo csv 
-    -ordenado alfabeticamente
+1. Hacer diccionario con 2 archivos txt *
+2. Usar diccionario para generar archivo csv *
+    -ordenado alfabeticamente*
 
 
 ETAPA 9
@@ -11,28 +11,28 @@ ETAPA 9
     -ingresarlos a 1 diccionario de listas con clave nombre y valor lista con
      aciertos, errores, puntaje parcial, puntaje total*
     
-2. Dinamica de juego
-    - Mostrar rosco de que jugador jugo cada turno
-    - Al errar una palabra pasa al siguiente jugador
-    - En cada turno mostrar jugador y la lista de participantes en orden
+2. Dinamica de juego*
+    - Mostrar rosco de que jugador jugo cada turno*
+    - Al errar una palabra pasa al siguiente jugador*
+    - En cada turno mostrar jugador y la lista de participantes en orden*
 
-3. Al finalizar Partida
-    -agregar nombre del jugador al resumen de la partida(cada turno)
-    -mostrar puntajes parciales y  de la partida
+3. Al finalizar Partida*
+    -agregar nombre del jugador al resumen de la partida(cada turno)*
+    -mostrar puntajes parciales y  de la partida*
     -preguntar si se quiere jugar otra solo si no llego al max de partidas
-    max(?)
+    max(?)*
 
-4. Al finalizar Juego
-    -Mostrar Reporte Final (cant partidas jugadas)
-    -Mostrar puntaje final (por cada jugador)
+4. Al finalizar Juego*
+    -Mostrar Reporte Final (cant partidas jugadas)*
+    -Mostrar puntaje final (por cada jugador)*
 
 
 ETAPA 10
-1. En caso de no poder obtener 1 o más valores de archivo configuacion
-    -Establecer valores por defecto(al inicio del juego)
-2. Al establecer, mostrar archivo por pantalla y si los valores fueron asignados
-    por omision(los del archivo) o configuracion(cuando usuario cambia).
-3. El juegador podrá configurar los valores por defecto al finalizar el primer 
-juego(o al iniciar una nuevo juego)
+1. En caso de no poder obtener 1 o más valores de archivo configuacion*
+    -Establecer valores por defecto(al inicio del juego)*
+2. Al establecer, mostrar archivo por pantalla y si los valores fueron asignados*
+    por omision(los del archivo) o configuracion(cuando usuario cambia).*
+3. El juegador podrá configurar los valores por defecto al finalizar el primer* 
+juego(o al iniciar una nuevo juego)*
 
 Hola Mundo

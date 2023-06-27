@@ -1,0 +1,55 @@
+import pandas as pd
+
+def continuar_cambio_configuracion(pregunta):
+    '''
+    Autor: Dario
+    >>> continuar_cambio_configuracion('n')
+    False
+    >>> continuar_cambio_configuracion('s')
+    True
+    '''
+    respuesta = False
+    if pregunta == 's' or pregunta == 'S':
+        respuesta = True
+    return respuesta
+
+def pregunta_opcion():
+    '''
+    Autor: Luz
+    '''
+    opcion = int(input('Ingrese el numero de la opcion que desea modificar: '))
+    while(0 > opcion or opcion > 4):
+        opcion = int(input('La opcion debe estar entre 0 y 4: '))
+    return opcion
+
+def configuracion():
+    '''
+    Autor: Luz y Dario
+    '''
+    configuracion = pd.read_csv('TP-Pasapalabra-Algo-1-2023\configuracion.csv')
+    pregunta = input('¿Desea modificar los valores de la configuración del juego? (s/n): ')
+    respuesta = continuar_cambio_configuracion(pregunta)
+    while(respuesta):
+        print(configuracion)
+        opcion = pregunta_opcion()
+        if(opcion == 0):
+            valor = int(input('Ingrese el valor: '))
+            configuracion.loc[[opcion], ['VALOR']] = valor
+        elif(opcion == 1):
+            valor = int(input('Ingrese el valor: '))
+            configuracion.loc[[opcion], ['VALOR']] = valor
+        elif(opcion == 2):
+            valor = int(input('Ingrese el valor: '))
+            configuracion.loc[[opcion], ['VALOR']] = valor
+        elif(opcion == 3):
+            valor = int(input('Ingrese el valor: '))
+            configuracion.loc[[opcion], ['VALOR']] = valor
+        elif(opcion == 4):
+            valor = int(input('Ingrese el valor: '))
+            configuracion.loc[[opcion], ['VALOR']] = valor
+        pregunta = input('¿Desea seguir modificando? (s/n): ')
+        respuesta = continuar_cambio_configuracion(pregunta)
+    return configuracion
+
+configuracion = str(configuracion())
+print(configuracion)
