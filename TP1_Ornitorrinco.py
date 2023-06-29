@@ -65,8 +65,9 @@ def preguntar_cant_jugadores():
         cant_jugadores = int(input('el maximo de jugadores es 4! Ingrese nuevamente la cantidad: '))
     return cant_jugadores
 
-def listar_jugadores(cant_jugadores, longitud_palabra_minima):
+def listar_jugadores(cant_jugadores, lista_de_valores):
     lista_jugadores = []
+    longitud_palabra_minima = int(lista_de_valores[0][1])
     for i in range(1, cant_jugadores + 1):
         nombre = input('Ingrese el nombre del jugador '+ str(i) +': ')
         while(validar_nombre(nombre, longitud_palabra_minima) == False or (nombre in lista_jugadores)):
@@ -121,42 +122,42 @@ def pregunta_opcion():
         opcion = int(input('La opcion debe estar entre 0 y 4: '))
     return opcion
 
-def configuracion():
+def configuracion(configuracion_original, lista_de_valores):
     '''
     Autor: Luz y Dario
     '''
-    configuracion = pd.read_csv('TP-Pasapalabra-Algo-1-2023\configuracion.csv')
     pregunta = input('¿Desea modificar los valores de la configuración del juego? (s/n): ')
     respuesta = continuar_cambio_configuracion(pregunta)
     while(respuesta):
-        print(configuracion)
+        print(configuracion_original)
         opcion = pregunta_opcion()
         if(opcion == 0):
             valor = int(input('Ingrese el valor: '))
-            configuracion.loc[[opcion], ['VALOR']] = valor
+            lista_de_valores[opcion][1] = valor
         elif(opcion == 1):
             valor = int(input('Ingrese el valor: '))
-            configuracion.loc[[opcion], ['VALOR']] = valor
+            lista_de_valores[opcion][1] = valor
         elif(opcion == 2):
             valor = int(input('Ingrese el valor: '))
-            configuracion.loc[[opcion], ['VALOR']] = valor
+            lista_de_valores[opcion][1] = valor
         elif(opcion == 3):
             valor = int(input('Ingrese el valor: '))
-            configuracion.loc[[opcion], ['VALOR']] = valor
+            lista_de_valores[opcion][1] = valor
         elif(opcion == 4):
             valor = int(input('Ingrese el valor: '))
-            configuracion.loc[[opcion], ['VALOR']] = valor
+            lista_de_valores[opcion][1] = valor
         pregunta = input('¿Desea seguir modificando? (s/n): ')
         respuesta = continuar_cambio_configuracion(pregunta)
-    return configuracion
+    return lista_de_valores
 
 #FUNCIONES ETAPA 3
-def seleccionar_letras(letras_a_procesar, cant_letras):
+def seleccionar_letras(letras_a_procesar, lista_de_valores):
     """
     Obj: Recibe una lista y devuelve otra con X elementos al azar únicos de la misma ordenados alfabeticamente. La long de la lista debe
     ser mayor que los X elementos deseados.
     Autores: Luz y Eduardo 
     """
+    cant_letras = int(lista_de_valores[1][1])
     letras_participantes=[]
     copia_de_letras=copy.deepcopy(letras_a_procesar)
     #si solo igualo las listas, python considera que copia de letras y letras a procesar
@@ -181,7 +182,7 @@ def conseguir_palabra(definiciones, letra_a_procesar):
     palabra=(list(definiciones[letra_a_procesar].keys()))[numero]
     return(palabra)
 
-def crear_palabras_del_juego (definiciones, letras_participantes):
+def crear_palabras_del_juego (definiciones, letras_participantes, longitud_palabra_minima):
     """
     Obj: Recibe el diccionario y una lista de letras participantes, selecciona una palabra al azar
     por cada una de tales letras y las retorna ordenadas alfabeticamente.  
@@ -191,7 +192,7 @@ def crear_palabras_del_juego (definiciones, letras_participantes):
     for letra in letras_participantes:
         palabra=conseguir_palabra(definiciones,letra)
         palabras_rosco.append(palabra)
-    
+        
     return (palabras_rosco)
 
 
@@ -316,10 +317,12 @@ def mostrar_lista_participantes(diccionario_jugadores):
     print('\n')
 # Funciones Etapa 5
 
-def calcular_puntaje_partida(diccionario_jugadores, puntos_acierto, puntos_error):
+def calcular_puntaje_partida(diccionario_jugadores, lista_de_valores):
     """Calcula y devuelve el puntaje de una ronda determinada dados los aciertos y errores cometidos.
         Autor:Dario y Luz
     """
+    puntos_acierto = int(lista_de_valores[3][1])
+    puntos_error = int(lista_de_valores[4][1])
     for jugador in diccionario_jugadores:
         puntaje = puntos_acierto*diccionario_jugadores[jugador][ACIERTOS]+puntos_error*diccionario_jugadores[jugador][ERRORES]
         diccionario_jugadores[jugador][PUNTAJE_PARTIDA] = puntaje
@@ -376,7 +379,7 @@ def mostrar_reporte_final(diccionario_jugadores, numero_partidas):
         print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' - ' + str(diccionario_jugadores[jugador][PUNTAJE_PARCIAL]) + ' puntos')
 
 
-def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, lista_jugadores, diccionario_jugadores, puntos_acierto, puntos_error):
+def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, lista_jugadores, diccionario_jugadores, lista_de_valores):
     """
     La funcion jugar es el encargado de mostrar por pantalla el tablero,tambien se encarga de manejar el juego
     interactuando con el usuario y mostrando como avanza la partida
@@ -419,7 +422,7 @@ def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaj
     
     mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego, lista_jugadores)
     mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, palabras_del_juego, lista_jugadores_por_turno)
-    calcular_puntaje_partida(diccionario_jugadores, puntos_acierto, puntos_error) 
+    calcular_puntaje_partida(diccionario_jugadores, lista_de_valores) 
     agregar_puntaje_parcial(diccionario_jugadores)
     mostrar_puntajes(diccionario_jugadores) 
     for jugador in diccionario_jugadores : 
@@ -435,42 +438,58 @@ def main():
     definiciones={}
     letras=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
                         'x', 'y', 'z']
-    sigue_jugando=True
     puntaje = 0
     contador_partidas = 1
+    jugando = 1
+    continuar_jugando = True
 
     cant_jugadores = preguntar_cant_jugadores()
-    configuracion = pd.read_csv('TP-Pasapalabra-Algo-1-2023\configuracion.csv')
-    lista_de_valores = configuracion.to_numpy().tolist()
-    cant_letras = int(lista_de_valores[1][1])
-    longitud_palabra_minima = int(lista_de_valores[0][1])
-    puntos_acierto = int(lista_de_valores[3][1])
-    puntos_error = int(lista_de_valores[4][1])
+    configuracion_original = pd.read_csv('TP-Pasapalabra-Algo-1-2023\configuracion.csv')
+    lista_de_valores = configuracion_original.to_numpy().tolist()
 
     #PREARMADO DEL JUEGO
     definiciones = cargar_diccionario()
-    lista_jugadores = listar_jugadores(cant_jugadores, longitud_palabra_minima)
+    lista_jugadores = listar_jugadores(cant_jugadores, lista_de_valores)
     diccionario_jugadores = cargar_diccionario_jugadores(lista_jugadores)
 
     #JUEGO
-    while sigue_jugando:
-        max_partidas = configuracion.loc[[2],['VALOR']]
-        print('La configuracion es: ')
-        print(configuracion)
-        letras_del_juego=seleccionar_letras(letras, cant_letras) 
-        palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego)
-        print(palabras_del_juego)
-    #POST Ronda(PUNTUACION+nueva partida)
-        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores, puntos_acierto, puntos_error)
-        
-        continua=input('Desea jugar otra partida? Presione la tecla "s", cualquier otra para salir:')
-        acepta_continuar="s"
-        if not continua.lower()==acepta_continuar or contador_partidas > max_partidas:
-            sigue_jugando=False
-        else:
-            contador_partidas += 1
-    print(mostrar_reporte_final(diccionario_jugadores, contador_partidas))
-    print(configuracion())
+    while(continuar_jugando):
+        if(jugando > 1):
+            lista_de_valores = configuracion_nueva.to_numpy().tolist()
+        sigue_jugando = True
+        while sigue_jugando:
+            max_partidas = int(lista_de_valores[2][1])
+            print('\nLa configuracion es: ')
+            if(jugando > 1):
+                print('\n', configuracion_nueva)
+            else:
+                print('\n', configuracion_original)
+            letras_del_juego=seleccionar_letras(letras, lista_de_valores) 
+            palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego)
+            print('\n',palabras_del_juego)
+        #POST Ronda(PUNTUACION+nueva partida)
+            puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores, lista_de_valores)
+            if(contador_partidas < max_partidas):
+                continua=input('\nDesea jugar otra partida? (s/n): ')
+            else:
+                print('\nLlegaste al máximo de partidas')
+            acepta_continuar='s'
+            if not continua.lower()==acepta_continuar or contador_partidas >= max_partidas:
+                sigue_jugando=False
+            else:
+                contador_partidas += 1
+
+        mostrar_reporte_final(diccionario_jugadores, contador_partidas)
+        continua_jugando=input('\nDesea jugar de nuevo? (s/n): ')
+        continuar = 's'
+        if(continua_jugando == continuar):
+            lista_nueva = configuracion(configuracion_original, lista_de_valores)
+            configuracion_nueva = pd.DataFrame(lista_nueva)
+            jugando += 1
+            print(configuracion_nueva)
+        else: 
+            continuar_jugando = False
+    print('\nGAME OVER')
 
 if __name__ == "__main__":
     main()
