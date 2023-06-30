@@ -1,7 +1,6 @@
 import random
 import copy
 import doctest
-import pandas as pd
 
 #CONSTANTES
 POSICION_PALABRA_INGRESADA = -1
@@ -9,15 +8,21 @@ ACIERTOS = 0
 ERRORES = 1
 PUNTAJE_PARCIAL = 2
 PUNTAJE_PARTIDA = 3
+MAX_L = 20
+MIN_L = 4
+MAX_JUGADORES = 4
+MIN_JUGADORES = 1
 
 #ETAPA_8
 def cargar_diccionario():
     '''
+    Obj: Crea diccionario con clave letra que a su vez tiene un diccionario clave palabra y valor 
+    definición, partiendo de dos archivos txt.
     Autores: Dario y Luz
     '''
     diccionario = {}
-    archivo_palabras = open("TP-Pasapalabra-Algo-1-2023\palabras.txt", "r", encoding="utf8")
-    archivo_definiciones = open("TP-Pasapalabra-Algo-1-2023\definiciones.txt", "r", encoding="utf8")
+    archivo_palabras = open(".\palabras.txt", "r", encoding="utf8")
+    archivo_definiciones = open(".\definiciones.txt", "r", encoding="utf8")
     palabra = archivo_palabras.readline().rstrip('\n')
     definicion = archivo_definiciones.readline().rstrip('\n')
     while(palabra != ''):
@@ -33,6 +38,7 @@ def cargar_diccionario():
 
 def generar_archivo_diccionario_ordenado(diccionario):
     '''
+    Obj: A partir del diccionario de diccionarios crea un archivo csv ordenado alfabéticamente. 
     Autores: Dario y Luz
     '''
     archivo_csv = open(".\diccionario_ordenado.csv", "w", encoding="utf8")
@@ -42,8 +48,9 @@ def generar_archivo_diccionario_ordenado(diccionario):
     archivo_csv.close()
 
 #ETAPA 9
-def validar_nombre(nombre, longitud_palabra_minima):
+def validar_nombre(nombre):
     '''
+    Obj: Valida la longitud del nombre ingresado.
     Autores: Dario y Luz
 
     >>> validar_nombre('Dario')
@@ -55,28 +62,37 @@ def validar_nombre(nombre, longitud_palabra_minima):
     '''
     respuesta = False
     largo_nom = len(nombre)
-    if(largo_nom >= longitud_palabra_minima and largo_nom <= 20 and nombre.isalnum()):
+    if(largo_nom >= MIN_L and largo_nom <= MAX_L and nombre.isalnum()):
         respuesta = True
     return respuesta
 
 def preguntar_cant_jugadores():
+    '''
+    Obj: Pregunta la cantidad de jugadores validando el max y min de jugadores.
+    Autores: Dario y Luz
+    '''
     cant_jugadores = int(input('Ingrese la cantidad de jugadores (hasta un maximo de 4): '))
-    while(cant_jugadores <= 0 or cant_jugadores > 4):
+    while(cant_jugadores < MIN_JUGADORES or cant_jugadores > MAX_JUGADORES):
         cant_jugadores = int(input('el maximo de jugadores es 4! Ingrese nuevamente la cantidad: '))
     return cant_jugadores
 
-def listar_jugadores(cant_jugadores, lista_de_valores):
+def listar_jugadores(cant_jugadores):
+    '''
+    Obj: Crea una lista con los jugadores ingresados.
+    Autores : Dario y Luz
+    '''
     lista_jugadores = []
-    longitud_palabra_minima = int(lista_de_valores[0][1])
     for i in range(1, cant_jugadores + 1):
         nombre = input('Ingrese el nombre del jugador '+ str(i) +': ')
-        while(validar_nombre(nombre, longitud_palabra_minima) == False or (nombre in lista_jugadores)):
+        while(validar_nombre(nombre) == False or (nombre in lista_jugadores)):
             nombre = input('El nombre ingresado no puede repetirse, debe contener como mínimo 4 caracteres y estos deben ser alfanumericos: ')
         lista_jugadores.append(nombre)
     return lista_jugadores
 
 def cargar_diccionario_jugadores(lista_jugadores):
     '''
+    Obj: Crea diccionario con clave Nombre del jugador y valor una lista con 4 valores en 0
+    estos son los ACIERTOS, ERRORES, PUNTAJE_PARCIAL y PUNTAJE_PARTIDA.
     Autores: Dario y Luz
     >>> cargar_diccionario_jugadores(['Dario', 'Luz', 'Agus'])
     {'Dario': [0, 0, 0, 0], 'Luz': [0, 0, 0, 0], 'Agus': [0, 0, 0, 0]}
@@ -92,63 +108,22 @@ def cargar_diccionario_jugadores(lista_jugadores):
         diccionario_jugadores[nombre] = lista_de_valores
     return diccionario_jugadores
 
-def mostrar_jugadores(diccionario_jugadores):
-    num_jugador = 1
-    print('jugadores:')
-    for i in diccionario_jugadores.keys():
-        print(str(num_jugador) +'. '+ i +' - aciertos: '+ str(diccionario_jugadores[i][ACIERTOS]) + ' - errores: ' + str(diccionario_jugadores[i][ERRORES]))
-        num_jugador += 1
-
 #ETAPA 10
-def continuar_cambio_configuracion(pregunta):
-    '''
-    Autor: Dario
-    >>> continuar_cambio_configuracion('n')
-    False
-    >>> continuar_cambio_configuracion('s')
-    True
-    '''
-    respuesta = False
-    if pregunta == 's' or pregunta == 'S':
-        respuesta = True
-    return respuesta
 
-def pregunta_opcion():
+def crear_lista_de_valores(configuracion):
     '''
-    Autor: Luz
+    Obj: Crea una lista de listas, donde cada sublista es una línea del archivo configuracion.csv
+    Autores: Dario y Luz
     '''
-    opcion = int(input('Ingrese el numero de la opcion que desea modificar: '))
-    while(0 > opcion or opcion > 4):
-        opcion = int(input('La opcion debe estar entre 0 y 4: '))
-    return opcion
-
-def configuracion(configuracion_original, lista_de_valores):
-    '''
-    Autor: Luz y Dario
-    '''
-    pregunta = input('¿Desea modificar los valores de la configuración del juego? (s/n): ')
-    respuesta = continuar_cambio_configuracion(pregunta)
-    while(respuesta):
-        print(configuracion_original)
-        opcion = pregunta_opcion()
-        if(opcion == 0):
-            valor = int(input('Ingrese el valor: '))
-            lista_de_valores[opcion][1] = valor
-        elif(opcion == 1):
-            valor = int(input('Ingrese el valor: '))
-            lista_de_valores[opcion][1] = valor
-        elif(opcion == 2):
-            valor = int(input('Ingrese el valor: '))
-            lista_de_valores[opcion][1] = valor
-        elif(opcion == 3):
-            valor = int(input('Ingrese el valor: '))
-            lista_de_valores[opcion][1] = valor
-        elif(opcion == 4):
-            valor = int(input('Ingrese el valor: '))
-            lista_de_valores[opcion][1] = valor
-        pregunta = input('¿Desea seguir modificando? (s/n): ')
-        respuesta = continuar_cambio_configuracion(pregunta)
+    lista_de_valores = []
+    linea = configuracion.readline()
+    while linea != '':
+        opcion, valor = linea.rstrip('\n').split(',')
+        line = [opcion, valor]
+        lista_de_valores.append(line)
+        linea = configuracion.readline()
     return lista_de_valores
+
 
 #FUNCIONES ETAPA 3
 def seleccionar_letras(letras_a_procesar, lista_de_valores):
@@ -158,6 +133,7 @@ def seleccionar_letras(letras_a_procesar, lista_de_valores):
     Autores: Luz y Eduardo 
     """
     cant_letras = int(lista_de_valores[1][1])
+    print(cant_letras)
     letras_participantes=[]
     copia_de_letras=copy.deepcopy(letras_a_procesar)
     #si solo igualo las listas, python considera que copia de letras y letras a procesar
@@ -176,22 +152,30 @@ def conseguir_palabra(definiciones, letra_a_procesar):
     """
     Obj: Recibe el diccionario y una letra, retorna una palabra al azar del 
     diccionario que empieza con tal letra.
-    Autores:Eduardo y Luz
+    Autores: Luz
     """
     numero=random.randint(0,len(definiciones[letra_a_procesar].keys())-1)
     palabra=(list(definiciones[letra_a_procesar].keys()))[numero]
     return(palabra)
 
-def crear_palabras_del_juego (definiciones, letras_participantes, longitud_palabra_minima):
+def crear_palabras_del_juego (definiciones, letras_participantes, lista_de_valores):
     """
     Obj: Recibe el diccionario y una lista de letras participantes, selecciona una palabra al azar
     por cada una de tales letras y las retorna ordenadas alfabeticamente.  
-    Autores:Eduardo y Luz
+    Autores: Dario y Luz
     """
+    longitud_palabra_minima = int(lista_de_valores[0][1])
     palabras_rosco=[]
+    
     for letra in letras_participantes:
         palabra=conseguir_palabra(definiciones,letra)
-        palabras_rosco.append(palabra)
+        longitud_correcta = True
+        while longitud_correcta:
+            if len(palabra) >= longitud_palabra_minima:
+                palabras_rosco.append(palabra)
+                longitud_correcta = False
+            else:
+                palabra = conseguir_palabra(definiciones, letra)
         
     return (palabras_rosco)
 
@@ -200,10 +184,10 @@ def crear_palabras_del_juego (definiciones, letras_participantes, longitud_palab
 #FUNCIONES ETAPA 1
 def verificador_de_palabra(palabra_del_turno):
     '''
-    La funcion verificador_de_palabra recibe el turno y las palabras_del_juego, va a llamar a 
+    Obj: La funcion verificador_de_palabra recibe el turno y las palabras_del_juego, va a llamar a 
     obtener_longitud_palabra para luego verificar que la palabra ingresada cumpla con las
     condiciones necesarias para usarse ,en caso contrario volvera a preguntar hasta devolver la palabra pedida.
-    AUTOR: Dario y Luz.
+    Autores: Dario y Luz
     '''
     palabra = input("Ingrese palabra: ")
     palabra_ingresada= palabra.lower()
@@ -220,9 +204,12 @@ def verificador_de_palabra(palabra_del_turno):
 
 def confirmar_palabra(palabra_a_confirmar,lista_palabras_ingresadas,palabras_del_juego:list):
     '''
-    Esta funcion devuelve True o False dependiendo de si la palabra ingresada por el usuario 
+    Obj: Devuelve True o False dependiendo de si la palabra ingresada por el usuario 
     este en la lista de palabras del juego y a su vez que su posicion sea la correcta.
-    AUTOR: Dario.
+    Autor: Dario y Luz
+
+    Para defensa del TP
+    print(confirmar_palabra('cabra', ['cabra', 'cabra'], ['ancla', 'cabra']))
     '''
     lista_indices = [indice for indice, dato in enumerate(lista_palabras_ingresadas) if dato == palabra_a_confirmar]
     if palabra_a_confirmar in palabras_del_juego and palabra_a_confirmar == palabras_del_juego[lista_indices[-1]]:
@@ -233,10 +220,8 @@ def confirmar_palabra(palabra_a_confirmar,lista_palabras_ingresadas,palabras_del
 
 def incrementar_aciertos_errores(validacion, cant_aciertos, cant_errores):
     '''    
-    La funcion incrementar_aciertos_errores recibe palabra_ingresada,cant_aciertos, cant_errores,
-    lista_palabras_ingresadas,palabras_del_juego va a llamar a la funcion confirmar_palabra,
-    contara los aciertos y los errores y los devolvera.
-    Autor:Sebastián
+    Obj: Si la validación es True incrementa aciertos, de lo contrario incrementa errores.
+    Autor: Dario
     
     >>> incrementar_aciertos_errores(True, 0, 0)
     (1, 0)
@@ -256,8 +241,8 @@ def incrementar_aciertos_errores(validacion, cant_aciertos, cant_errores):
 
 def mostrar_rosco_letras(letras_participantes):
     '''
-    Muestra por pantalla el rosco de las letras participantes
-    AUTOR: Dario
+    Obj: Devuelve el rosco de las letras participantes
+    Autor: Dario
     >>> mostrar_rosco_letras(['A','B','C'])
     '[A][B][C]'
     >>> mostrar_rosco_letras(['D','E','F'])
@@ -269,7 +254,13 @@ def mostrar_rosco_letras(letras_participantes):
         letras += '['+letra.upper()+']'
     return letras
 
+# ETAPA 9
+
 def mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego):
+    '''
+    Obj: Devuelve el rosco de jugadores, dependiendo de quien jugo en cada turno.
+    Autores: Dario y Luz
+    '''
     resultado=''
     indice_jugador = 1
     i = 0
@@ -289,11 +280,20 @@ def mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabra
             resultado += '[ ]'
     return resultado
 
+def mostrar_lista_participantes(diccionario_jugadores):
+    '''
+    Obj: Muestra por pantalla los jugadores activos con sus respectivos aciertos y errores.
+    Autores: Dario y Luz
+    '''
+    print('\nJugadores:')
+    for jugador in diccionario_jugadores:
+        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' -  Aciertos: ' + str(diccionario_jugadores[jugador][ACIERTOS]) + ' - Errores: ' + str(diccionario_jugadores[jugador][ERRORES]))
+    print('\n')
+
 def resultado_palabra(lista_palabras_ingresadas:list,letras_participantes:list,palabras_del_juego:list):
     '''
-    Muestra por pantalla [ ] vacios si todavia no se ingreso una palabra, una [e] si la palabra 
-    ingresada es un error o una [a] si es un acierto.
-    AUTOR: Dario.
+    Obj: Devuelve el rosco de aciertos y errores dependiendo del turno.
+    Autor: Dario.
     '''
     resultado=''
     if len(lista_palabras_ingresadas) == 0:
@@ -310,16 +310,14 @@ def resultado_palabra(lista_palabras_ingresadas:list,letras_participantes:list,p
             resultado += '[ ]'
     return resultado
 
-def mostrar_lista_participantes(diccionario_jugadores):
-    print('\nJugadores:')
-    for jugador in diccionario_jugadores:
-        print(str(list(diccionario_jugadores.keys()).index(jugador)+1) + '. ' + jugador + ' -  Aciertos: ' + str(diccionario_jugadores[jugador][ACIERTOS]) + ' - Errores: ' + str(diccionario_jugadores[jugador][ERRORES]))
-    print('\n')
+
+
 # Funciones Etapa 5
 
 def calcular_puntaje_partida(diccionario_jugadores, lista_de_valores):
-    """Calcula y devuelve el puntaje de una ronda determinada dados los aciertos y errores cometidos.
-        Autor:Dario y Luz
+    """
+    Obj: Calcula y devuelve el puntaje de una ronda determinada dados los aciertos y errores cometidos.
+    Autores:Dario y Luz
     """
     puntos_acierto = int(lista_de_valores[3][1])
     puntos_error = int(lista_de_valores[4][1])
@@ -328,9 +326,10 @@ def calcular_puntaje_partida(diccionario_jugadores, lista_de_valores):
         diccionario_jugadores[jugador][PUNTAJE_PARTIDA] = puntaje
 
 def mostrar_puntajes(diccionario_jugadores):
-    """Muestra el puntaje de ronda y el total acumulado dados los aciertos y errores cometidos en la ronda
+    """
+    Obj: Muestra el puntaje de ronda y el total acumulado dados los aciertos y errores cometidos en la ronda
     actual.
-        Autor:Dario y Luz
+    Autores:Dario y Luz
     """
     print('\n')
     print('Puntaje de la partida:')
@@ -343,11 +342,16 @@ def mostrar_puntajes(diccionario_jugadores):
 
 
 def turnos(letra, largo_palabra, lista_jugadores, nombre_jugador):
+    '''
+    Obj: Muestra por pantalla el turno de la letra, el jugador a quien le toca y el 
+    largo de la palabra.
+    Autores: Dario y Luz
+    '''
     print('Turno Jugador '+ str(lista_jugadores.index(nombre_jugador)+1) + ' ' + nombre_jugador + ' ' + '- letra '+ letra.upper() + ' - Palabra de '+ str(largo_palabra) + ' letras')
 
 def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, lista_palabras_ordenadas, lista_jugadores_por_turno):
     """
-    La funcion imprime por pantalla el resultado turno por turno de la ronda que acaba de concluir. 
+    Obj: Muestra por pantalla el resultado turno por turno de la ronda que acaba de concluir. 
     Autores: Luz y Dario
     """
     indice = 0
@@ -361,15 +365,26 @@ def mostrar_resultado_partida(lista_palabras_ingresadas,letras_participantes, li
         indice += 1
 
 def agregar_puntaje_parcial(diccionario_jugadores):
+    '''
+    Obj: Agrega o suma el PUNTAJE_PARTIDA de cada jugadro al PUNTAJE_PARCIAL de cada jugador.
+    Autores: Dario y Luz
+    '''
     for jugador in diccionario_jugadores:
         diccionario_jugadores[jugador][PUNTAJE_PARCIAL] += diccionario_jugadores[jugador][PUNTAJE_PARTIDA]
 
 def mostrar_tablero(letras_participantes,lista_palabras_ingresadas,palabras_del_juego, lista_jugadores):
+    '''
+    Autores: Dario y Luz
+    '''
     print(mostrar_rosco_letras(letras_participantes))
     print(mostrar_rosco_jugadores(letras_participantes, lista_jugadores, lista_palabras_ingresadas, palabras_del_juego))
     print(resultado_palabra(lista_palabras_ingresadas,letras_participantes,palabras_del_juego))
 
 def mostrar_reporte_final(diccionario_jugadores, numero_partidas):
+    '''
+    Obj: Muestra el puntaje Final de cada jugador.
+    Autores: Dario y Luz
+    '''
     print('\n')
     print('Reporte Final:')
     print('Partidas jugadas:' + str(numero_partidas))
@@ -381,9 +396,8 @@ def mostrar_reporte_final(diccionario_jugadores, numero_partidas):
 
 def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaje, lista_jugadores, diccionario_jugadores, lista_de_valores):
     """
-    La funcion jugar es el encargado de mostrar por pantalla el tablero,tambien se encarga de manejar el juego
-    interactuando con el usuario y mostrando como avanza la partida
-    Autores:Luz y Dario
+    Obj: Ejecuta el juego completo, interactuando con el usuario.
+    Autores: Luz y Dario
     """
     turno=0
     cant_aciertos= 0
@@ -431,8 +445,11 @@ def jugar(letras_participantes,palabras_del_juego:list,definiciones:dict, puntaj
         diccionario_jugadores[jugador][ERRORES] = 0
     
     return puntaje
-        
+
 def main():
+    '''
+    Autores: Dario y Luz
+    '''
     
     #DEFINICIONES
     definiciones={}
@@ -440,56 +457,37 @@ def main():
                         'x', 'y', 'z']
     puntaje = 0
     contador_partidas = 1
-    jugando = 1
-    continuar_jugando = True
-
+    sigue_jugando = True
     cant_jugadores = preguntar_cant_jugadores()
-    configuracion_original = pd.read_csv('TP-Pasapalabra-Algo-1-2023\configuracion.csv')
-    lista_de_valores = configuracion_original.to_numpy().tolist()
-
     #PREARMADO DEL JUEGO
     definiciones = cargar_diccionario()
-    lista_jugadores = listar_jugadores(cant_jugadores, lista_de_valores)
+    lista_jugadores = listar_jugadores(cant_jugadores)
     diccionario_jugadores = cargar_diccionario_jugadores(lista_jugadores)
-
+    
     #JUEGO
-    while(continuar_jugando):
-        if(jugando > 1):
-            lista_de_valores = configuracion_nueva.to_numpy().tolist()
-        sigue_jugando = True
-        while sigue_jugando:
-            max_partidas = int(lista_de_valores[2][1])
-            print('\nLa configuracion es: ')
-            if(jugando > 1):
-                print('\n', configuracion_nueva)
-            else:
-                print('\n', configuracion_original)
-            letras_del_juego=seleccionar_letras(letras, lista_de_valores) 
-            palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego)
-            print('\n',palabras_del_juego)
-        #POST Ronda(PUNTUACION+nueva partida)
-            puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores, lista_de_valores)
-            if(contador_partidas < max_partidas):
-                continua=input('\nDesea jugar otra partida? (s/n): ')
-            else:
-                print('\nLlegaste al máximo de partidas')
-            acepta_continuar='s'
-            if not continua.lower()==acepta_continuar or contador_partidas >= max_partidas:
-                sigue_jugando=False
-            else:
-                contador_partidas += 1
-
-        mostrar_reporte_final(diccionario_jugadores, contador_partidas)
-        continua_jugando=input('\nDesea jugar de nuevo? (s/n): ')
-        continuar = 's'
-        if(continua_jugando == continuar):
-            lista_nueva = configuracion(configuracion_original, lista_de_valores)
-            configuracion_nueva = pd.DataFrame(lista_nueva)
-            jugando += 1
-            print(configuracion_nueva)
-        else: 
-            continuar_jugando = False
-    print('\nGAME OVER')
+    while sigue_jugando:
+        configuracion = open('.\configuracion.csv', 'r', encoding="utf8")
+        lista_de_valores = crear_lista_de_valores(configuracion)
+        max_partidas = int(lista_de_valores[2][1])
+        print('\nLa configuracion es: ')
+        print('\n',configuracion)
+        letras_del_juego=seleccionar_letras(letras, lista_de_valores) 
+        palabras_del_juego=crear_palabras_del_juego(definiciones,letras_del_juego, lista_de_valores)
+        print('\n',palabras_del_juego)
+    #POST Ronda(PUNTUACION+nueva partida)
+        puntaje = jugar(letras_del_juego,palabras_del_juego,definiciones, puntaje, lista_jugadores, diccionario_jugadores, lista_de_valores)
+        if(contador_partidas < max_partidas):
+            continua=input('\nDesea jugar otra partida? (s/n): ')
+        else:
+            print('\nLlegaste al máximo de partidas')
+        acepta_continuar='s'
+        if not continua.lower()==acepta_continuar or contador_partidas >= max_partidas:
+            sigue_jugando=False
+        else:
+            contador_partidas += 1
+    configuracion.close()
+    mostrar_reporte_final(diccionario_jugadores, contador_partidas)
+    print(':::::::::::::::\n   GAME OVER\n:::::::::::::::')
 
 if __name__ == "__main__":
     main()
