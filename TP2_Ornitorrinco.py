@@ -21,8 +21,8 @@ def cargar_diccionario():
     Autores: Dario y Luz
     '''
     diccionario = {}
-    archivo_palabras = open(".\palabras.txt", "r", encoding="utf8")
-    archivo_definiciones = open(".\definiciones.txt", "r", encoding="utf8")
+    archivo_palabras = open("TP-Pasapalabra-Algo-1-2023\palabras.txt", "r", encoding="utf8")
+    archivo_definiciones = open("TP-Pasapalabra-Algo-1-2023\definiciones.txt", "r", encoding="utf8")
     palabra = archivo_palabras.readline().rstrip('\n')
     definicion = archivo_definiciones.readline().rstrip('\n')
     while(palabra != ''):
@@ -465,7 +465,7 @@ def main():
     
     #JUEGO
     while sigue_jugando:
-        configuracion = open('.\configuracion.csv', 'r', encoding="utf8")
+        configuracion = open('TP-Pasapalabra-Algo-1-2023\configuracion.csv', 'r', encoding="utf8")
         lista_de_valores = crear_lista_de_valores(configuracion)
         max_partidas = int(lista_de_valores[2][1])
         print('\nLa configuracion es: ')
